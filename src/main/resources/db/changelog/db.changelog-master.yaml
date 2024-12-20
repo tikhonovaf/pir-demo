@@ -1,0 +1,87 @@
+databaseChangeLog:
+  - changeSet:
+      id: pir-demo-2024-12-20-Create tables
+      author: Arkadiy.Tikhonov
+      sql:
+        CREATE TABLE appeals_channel_aclub (
+        code TEXT,
+        segment TEXT DEFAULT 'aclub',
+        name TEXT,
+        order_value INT,
+        constraint PK_APPEALS_CHANNEL_ACLUB_CODE PRIMARY KEY (code)
+        );
+      
+        INSERT INTO appeals_channel_aclub (code, name, order_value) VALUES
+        ('CA1', 'Чат', 1),
+        ('CA2', 'Линия для клиентов', 2),
+        ('CA3', 'Линия для сотрудников', 3);
+      rollback:
+        DROP TABLE IF EXISTS appeals_channel_aclub;
+  - changeSet:
+      id: pir-demo-2024-12-20-01-Create table status
+      author: Arkadiy.Tikhonov
+      sql:
+        CREATE TABLE status (
+          id bigint NOT NULL,
+          name character varying(100),
+          CONSTRAINT status_pkey PRIMARY KEY (id)
+        );
+  
+        INSERT INTO status (id, name) VALUES
+          (1, 'В работе'),
+          (2, 'Удален'),
+          (3, 'Новый');
+      rollback:
+        DROP TABLE IF EXISTS status;
+  - changeSet:
+      id: pir-demo-2024-12-20-02-Create table section
+      author: Arkadiy.Tikhonov
+      sql:
+        CREATE TABLE section (
+          id bigint NOT NULL,
+          name character varying(100),
+          CONSTRAINT section_pkey PRIMARY KEY (id)
+        );
+        
+        INSERT INTO section (id, name) VALUES
+          (1, 'АР'),
+          (2, 'КР'),
+          (3, 'ИОС1'),
+          (4, 'ИОС2'),
+          (5, 'ИОС3'),
+          (6, 'ИОС4'),
+          (7, 'ИОС5'),
+          (8, 'ИОС6');
+      rollback:
+        DROP TABLE IF EXISTS section;
+  - changeSet:
+      id: pir-demo-2024-12-20-03-Create table project
+      author: Arkadiy.Tikhonov
+      sql:
+        CREATE TABLE project (
+          id bigint NOT NULL,
+          code character varying(100),
+          name character varying(1000),
+          status_id bigint,
+          start_date date,
+          end_date date,
+          CONSTRAINT project_pkey PRIMARY KEY (id),
+          CONSTRAINT fk_project_status FOREIGN KEY (status_id)
+            REFERENCES public.status (id) MATCH SIMPLE
+            ON UPDATE SET NULL
+            ON DELETE SET NULL
+        );
+  - changeSet:
+      id: pir-demo-2024-12-20-04-Create table project_section
+      author: Arkadiy.Tikhonov
+      sql:
+        CREATE TABLE project_section (
+          project_id bigint NOT NULL,
+          section_id bigint NOT NULL,
+          CONSTRAINT project_section_pkey PRIMARY KEY (project_id, section_id),
+          CONSTRAINT fk_project_section_project FOREIGN KEY (project_id)
+            REFERENCES public.project (id) MATCH SIMPLE,
+          CONSTRAINT fk_project_section_section FOREIGN KEY (section_id)
+            REFERENCES public.section (id) MATCH SIMPLE
+        );
+
